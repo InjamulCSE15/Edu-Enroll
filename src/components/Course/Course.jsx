@@ -2,7 +2,7 @@
 import { BsCurrencyDollar } from "react-icons/bs";
 import { IoBookOutline } from "react-icons/io5";
 
-export default function Course({course}) {
+export default function Course({course, handleTotalCredit}) {
     const { id, title, course_thumbnail, course_details, price, credit } = course
     return (
         <article className="hover:border border-slate-50 rounded-lg shadow-lg p-2">
@@ -15,7 +15,7 @@ export default function Course({course}) {
                 <span className="flex items-center text-white font-bold text-xl"><BsCurrencyDollar /> <span>{price}</span></span>
                 <span className="flex items-center text-white text-lg"><IoBookOutline /> <span className="ps-2">{credit}hr</span></span>
             </div>
-            <button className="w-full bg-gray-900 text-white mt-2 py-2 px-4 rounded-lg font-bold hover:bg-slate-400 hover:text-gray-900">Enroll</button>
+            <button onClick={()=>handleTotalCredit(course)} className="w-full bg-gray-900 text-white mt-2 py-2 px-4 rounded-lg font-bold hover:bg-slate-400 hover:text-gray-900">Enroll</button>
         </article>
     )
 }

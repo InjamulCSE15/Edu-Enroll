@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { BsCurrencyDollar } from "react-icons/bs";
 import Course from "../Course/Course";
+import toast from "react-hot-toast";
 
 export default function Courses() {
     const [loading, setLoading] = useState(true);
-    const [crHourRemain, setCrHourRemain] = useState(0);
+    const [crHourRemain, setCrHourRemain] = useState(20);
     const [totalCrHour, setTotalCrHour] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
     const [courses, setCourses] = useState([]);
@@ -17,6 +18,14 @@ export default function Courses() {
                 setLoading(false);
             })
     }, []);
+
+    const handleTotalCredit = course => {
+        const enrolledCourse = courses.find((availableCourse) => availableCourse.id == course.id);
+        if(enrolledCourse){
+            toast.success(`${enrolledCourse.title} enrolled successfully.`)
+            console.log(enrolledCourse);
+        }
+    }
 
     return (
         <div className="container mx-auto my-6 md:px-8 sm:px-4">
@@ -41,7 +50,7 @@ export default function Courses() {
                             <div className="rounded-lg lg:col-span-2">
                                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                                     {
-                                        courses.map(course => <Course key={course.id} course={course} ></Course>)
+                                        courses.map(course => <Course key={course.id} course={course} handleTotalCredit={handleTotalCredit}></Course>)
                                     }
                                 </div>
                             </div>
@@ -55,7 +64,7 @@ export default function Courses() {
                                     <h3 className="font-medium  pb-2 border-b-2 border-gray-400">Credit Hour Remaining <span className="text-xl">{crHourRemain}</span>hr</h3>
                                     <div className="mt-2">
                                         <h3 className="font-medium text-xl">Course Name</h3>
-                                        <ol class="list-decimal p-4 border-b-2 border-gray-400">
+                                        <ol className="list-decimal p-4 border-b-2 border-gray-400">
                                             <li>Now this is a story all about how, my life got flipped-turned upside down</li>
                                         </ol>
                                         <h3 className="font-medium  py-2 border-b-2 border-gray-400">Total Credit Hour: <span className="text-xl">{totalCrHour}</span>hr</h3>
