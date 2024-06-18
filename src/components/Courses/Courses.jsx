@@ -25,20 +25,60 @@ export default function Courses() {
     const handleTotalCredit = course => {
         const enrolledCourse = courses.find((availableCourse) => availableCourse.id == course.id);
         const duplicateCheck = listOfCourses.find((checkDuplicate) => checkDuplicate.id == enrolledCourse.id);
-        if(duplicateCheck) {
+        if (duplicateCheck) {
             toast.error(`${duplicateCheck.title} already listed.`);
             return;
         }
         else {
-            if (enrolledCourse) {    
-            const selectedCourses = [...listOfCourses, enrolledCourse];
-            setListOfCourses(selectedCourses);
-            toast.success(`${enrolledCourse.title} enrolled successfully.`);
+            if (enrolledCourse) {
+                    console.log('totalCrHour:', totalCrHour, 'crHourRemain:', crHourRemain);  // Debugging logs
+                    if (totalCrHour >= 20 || crHourRemain <= 0) {
+                        toast.error('Credit limit is over.');
+                        console.log('Condition met: Credit limit is over.');  // Debugging log
+                        return;
+                    }
+                    const selectedCourses = [...listOfCourses, enrolledCourse];
+
+                    setListOfCourses(selectedCourses);
+                    toast.success(`${enrolledCourse.title} enrolled successfully.`);
+
+                    setTotalCrHour(prevTotalCrHour => {
+                        const newTotalCrHour = prevTotalCrHour + enrolledCourse.credit;
+                        console.log('Updated totalCrHour:', newTotalCrHour);
+                        return newTotalCrHour;
+                    });
+
+                    setCrHourRemain(prevCrHourRemain => {
+                        const newCrHourRemain = prevCrHourRemain - enrolledCourse.credit;
+                        console.log('Updated crHourRemain:', newCrHourRemain);
+                        return newCrHourRemain;
+                    });
+
+                    setTotalPrice(prevTotalPrice => {
+                        const newTotalPrice = (parseFloat(prevTotalPrice) + enrolledCourse.price).toFixed(2);
+                        console.log('Updated totalPrice:', newTotalPrice);
+                        return newTotalPrice;
+                    });
+                }
             }
 
+
+            // if (totalCrHour > 20 && crHourRemain <= 0) {    
+            //     toast.error('Credit limit is over.');
+            //     return;
+            // }
+            // else{
+            //     if(enrolledCourse){
+            //         const selectedCourses = [...listOfCourses, enrolledCourse];
+            //         setListOfCourses(selectedCourses);
+            //         toast.success(`${enrolledCourse.title} enrolled successfully.`);
+            //         setTotalCrHour(totalCrHour + enrolledCourse.credit);
+            //         setCrHourRemain(crHourRemain - enrolledCourse.credit);
+            //         setTotalPrice((totalPrice + enrolledCourse.price).toFixed(2));
+            //     }
+            // }
         }
-        
-    }
+   
 
     return (
         <div className="container mx-auto my-6 md:px-8 sm:px-4">
@@ -78,9 +118,9 @@ export default function Courses() {
                                     <div className="mt-2">
                                         <h3 className="font-medium text-xl">Course Name</h3>
                                         <ol className="list-none py-4">
-                                        {
-                                            listOfCourses.map((list, index) => <Enrolled key={list.id} list={list} i={index}></Enrolled>)
-                                        }
+                                            {
+                                                listOfCourses.map((list, index) => <Enrolled key={list.id} list={list} i={index}></Enrolled>)
+                                            }
                                         </ol>
                                         <h3 className="font-medium  py-2 border-b-2 border-gray-400">Total Credit Hour: <span className="text-xl">{totalCrHour}</span>hr</h3>
                                         <h3 className="font-medium flex items-center py-2  pb-2 border-b-2 border-gray-400">Total Price: <span className="text-xl flex items-center"><BsCurrencyDollar /> {totalPrice}</span></h3>
