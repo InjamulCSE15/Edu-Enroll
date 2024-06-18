@@ -31,10 +31,8 @@ export default function Courses() {
         }
         else {
             if (enrolledCourse) {
-                    console.log('totalCrHour:', totalCrHour, 'crHourRemain:', crHourRemain);  // Debugging logs
                     if (totalCrHour >= 20 || crHourRemain <= 0) {
                         toast.error('Credit limit is over.');
-                        console.log('Condition met: Credit limit is over.');  // Debugging log
                         return;
                     }
                     const selectedCourses = [...listOfCourses, enrolledCourse];
@@ -44,19 +42,19 @@ export default function Courses() {
 
                     setTotalCrHour(prevTotalCrHour => {
                         const newTotalCrHour = prevTotalCrHour + enrolledCourse.credit;
-                        console.log('Updated totalCrHour:', newTotalCrHour);
+                        
                         return newTotalCrHour;
                     });
 
                     setCrHourRemain(prevCrHourRemain => {
                         const newCrHourRemain = prevCrHourRemain - enrolledCourse.credit;
-                        console.log('Updated crHourRemain:', newCrHourRemain);
+                        
                         return newCrHourRemain;
                     });
 
                     setTotalPrice(prevTotalPrice => {
                         const newTotalPrice = (parseFloat(prevTotalPrice) + enrolledCourse.price).toFixed(2);
-                        console.log('Updated totalPrice:', newTotalPrice);
+                        
                         return newTotalPrice;
                     });
                 }
