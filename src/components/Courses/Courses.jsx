@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BsCurrencyDollar } from "react-icons/bs";
 import Course from "../Course/Course";
 import toast from "react-hot-toast";
+import Enrolled from "../Enrolled/Enrolled";
 
 export default function Courses() {
     const [loading, setLoading] = useState(true);
@@ -9,7 +10,9 @@ export default function Courses() {
     const [totalCrHour, setTotalCrHour] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
     const [courses, setCourses] = useState([]);
-    
+    const [listOfCourses, setListOfCourses] = useState([]);
+
+
     useEffect(() => {
         fetch('fakeData.json')
             .then(res => res.json(res))
@@ -21,10 +24,20 @@ export default function Courses() {
 
     const handleTotalCredit = course => {
         const enrolledCourse = courses.find((availableCourse) => availableCourse.id == course.id);
-        if(enrolledCourse){
-            toast.success(`${enrolledCourse.title} enrolled successfully.`)
-            console.log(enrolledCourse);
+        const duplicateCheck = listOfCourses.find((checkDuplicate) => checkDuplicate.id == enrolledCourse.id);
+        if(duplicateCheck) {
+            toast.error(`${duplicateCheck.title} already listed.`);
+            return;
         }
+        else {
+            if (enrolledCourse) {    
+            const selectedCourses = [...listOfCourses, enrolledCourse];
+            setListOfCourses(selectedCourses);
+            toast.success(`${enrolledCourse.title} enrolled successfully.`);
+            }
+
+        }
+        
     }
 
     return (
@@ -64,19 +77,19 @@ export default function Courses() {
                                     <h3 className="font-medium  pb-2 border-b-2 border-gray-400">Credit Hour Remaining <span className="text-xl">{crHourRemain}</span>hr</h3>
                                     <div className="mt-2">
                                         <h3 className="font-medium text-xl">Course Name</h3>
-                                        <ol className="list-decimal p-4 border-b-2 border-gray-400">
-                                            <li>Now this is a story all about how, my life got flipped-turned upside down</li>
+                                        <ol className="list-none py-4">
+                                        {
+                                            listOfCourses.map((list, index) => <Enrolled key={list.id} list={list} i={index}></Enrolled>)
+                                        }
                                         </ol>
                                         <h3 className="font-medium  py-2 border-b-2 border-gray-400">Total Credit Hour: <span className="text-xl">{totalCrHour}</span>hr</h3>
                                         <h3 className="font-medium flex items-center py-2  pb-2 border-b-2 border-gray-400">Total Price: <span className="text-xl flex items-center"><BsCurrencyDollar /> {totalPrice}</span></h3>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     )
             }
-
         </div>
     )
 }
