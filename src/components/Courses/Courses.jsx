@@ -3,6 +3,7 @@ import { BsCurrencyDollar } from "react-icons/bs";
 import Course from "../Course/Course";
 import toast from "react-hot-toast";
 import Enrolled from "../Enrolled/Enrolled";
+import { getEnrolledCourse, saveToLocalStorage } from "../../localStorage";
 
 export default function Courses() {
     const [loading, setLoading] = useState(true);
@@ -11,7 +12,6 @@ export default function Courses() {
     const [totalPrice, setTotalPrice] = useState(0);
     const [courses, setCourses] = useState([]);
     const [listOfCourses, setListOfCourses] = useState([]);
-
 
     useEffect(() => {
         fetch('fakeData.json')
@@ -22,6 +22,28 @@ export default function Courses() {
             })
     }, []);
 
+    useEffect(() => {
+        if (courses.length) {
+            const dataFromStorage = getEnrolledCourse();
+            const tempData = [];
+            let tempTotalCrHr = 0;
+            let tempTotalPrc = 0;
+            for (const id of dataFromStorage) {
+                const course = courses.find(course => course.id == id);
+                if(course){
+                    tempData.push(course);
+                    tempTotalCrHr += course.credit;
+                    tempTotalPrc += course.price;
+                }
+            }      
+            setListOfCourses(tempData);
+            setTotalCrHour(tempTotalCrHr);
+            const tempRemainingCr = crHourRemain - tempTotalCrHr;            
+            setCrHourRemain(tempRemainingCr);
+            setTotalPrice((tempTotalPrc).toFixed(2));
+        }
+    }, [courses]);
+
     const handleTotalCredit = course => {
         const enrolledCourse = courses.find((availableCourse) => availableCourse.id == course.id);
         const duplicateCheck = listOfCourses.find((checkDuplicate) => checkDuplicate.id == enrolledCourse.id);
@@ -31,52 +53,34 @@ export default function Courses() {
         }
         else {
             if (enrolledCourse) {
-                    if (totalCrHour >= 20 || crHourRemain <= 0) {
-                        toast.error('Credit limit is over.');
-                        return;
-                    }
-                    const selectedCourses = [...listOfCourses, enrolledCourse];
-
-                    setListOfCourses(selectedCourses);
-                    toast.success(`${enrolledCourse.title} enrolled successfully.`);
-
-                    setTotalCrHour(prevTotalCrHour => {
-                        const newTotalCrHour = prevTotalCrHour + enrolledCourse.credit;
-                        
-                        return newTotalCrHour;
-                    });
-
-                    setCrHourRemain(prevCrHourRemain => {
-                        const newCrHourRemain = prevCrHourRemain - enrolledCourse.credit;
-                        
-                        return newCrHourRemain;
-                    });
-
-                    setTotalPrice(prevTotalPrice => {
-                        const newTotalPrice = (parseFloat(prevTotalPrice) + enrolledCourse.price).toFixed(2);
-                        
-                        return newTotalPrice;
-                    });
+                if (totalCrHour >= 20 || crHourRemain <= 0) {
+                    toast.error('Credit limit is over.');
+                    return;
                 }
+                const selectedCourses = [...listOfCourses, enrolledCourse];
+
+                setListOfCourses(selectedCourses);
+                toast.success(`${enrolledCourse.title} enrolled successfully.`);
+
+                setTotalCrHour(prevTotalCrHour => {
+                    const newTotalCrHour = prevTotalCrHour + enrolledCourse.credit;
+                    return newTotalCrHour;
+                });
+
+                setCrHourRemain(prevCrHourRemain => {
+                    const newCrHourRemain = prevCrHourRemain - enrolledCourse.credit;
+                    return newCrHourRemain;
+                });
+
+                setTotalPrice(prevTotalPrice => {
+                    const newTotalPrice = (parseFloat(prevTotalPrice) + enrolledCourse.price).toFixed(2);
+                    return newTotalPrice;
+                });
             }
-
-
-            // if (totalCrHour > 20 && crHourRemain <= 0) {    
-            //     toast.error('Credit limit is over.');
-            //     return;
-            // }
-            // else{
-            //     if(enrolledCourse){
-            //         const selectedCourses = [...listOfCourses, enrolledCourse];
-            //         setListOfCourses(selectedCourses);
-            //         toast.success(`${enrolledCourse.title} enrolled successfully.`);
-            //         setTotalCrHour(totalCrHour + enrolledCourse.credit);
-            //         setCrHourRemain(crHourRemain - enrolledCourse.credit);
-            //         setTotalPrice((totalPrice + enrolledCourse.price).toFixed(2));
-            //     }
-            // }
+            saveToLocalStorage(enrolledCourse.id);
         }
-   
+    }
+
 
     return (
         <div className="container mx-auto my-6 md:px-8 sm:px-4">
